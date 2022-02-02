@@ -16,24 +16,22 @@ def sort_segments(directory)
 end
 
 def create_rows(segments)
-  max_row = (segments.count / MAX_COLUMN.to_f).ceil
   rows = []
-  segments.each_with_index do |s, i|
-    break if i == max_row
-
-    row = []
-    row << s.ljust(COLUMN_WIDTH)
-    (1..MAX_COLUMN - 1).each do |r|
-      row << segments[i + max_row * r].ljust(COLUMN_WIDTH) if i + max_row * r < segments.size
+  max_row = (segments.count / MAX_COLUMN.to_f).ceil
+  max_row.times do |t|
+    items = []
+    items << segments[t].ljust(COLUMN_WIDTH)
+    (1...MAX_COLUMN).each do |n|
+      items << segments[t + max_row * n].ljust(COLUMN_WIDTH) unless segments[t + max_row * n].nil?
     end
-    rows << row
+    rows << items
   end
   rows
 end
 
 def list_segments(rows)
-  rows.each do |c|
-    puts c.join('')
+  rows.each do |i|
+    puts i.join('')
   end
 end
 
