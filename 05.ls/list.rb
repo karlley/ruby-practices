@@ -1,18 +1,21 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'optparse'
+
 MAX_COLUMN = 3
 COLUMN_WIDTH = 15
 
 def main
+  option = ARGV.getopts('a')
   directory = ARGV[0] || Dir.getwd
-  files = sort_files(directory)
+  files = sort_files(directory, option)
   rows = create_rows(files)
   list_files(rows)
 end
 
-def sort_files(directory)
-  Dir.glob('*', base: directory)
+def sort_files(directory, option)
+  option['a'] ? Dir.glob('*', File::FNM_DOTMATCH, base: directory) : Dir.glob('*', base: directory)
 end
 
 def create_rows(files)
