@@ -15,8 +15,8 @@ def main
 end
 
 def sort_files(directory, option)
-  all_files = Dir.glob('*', File::FNM_DOTMATCH, base: directory)
-  option['a'] ? all_files : all_files.grep_v(/^[.].*/)
+  a_option = option['a'] ? File::FNM_DOTMATCH : 0
+  Dir.glob('*', a_option, base: directory)
 end
 
 def create_rows(files)
