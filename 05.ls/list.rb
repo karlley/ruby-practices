@@ -7,7 +7,7 @@ MAX_COLUMN = 3
 COLUMN_WIDTH = 15
 
 def main
-  option = ARGV.getopts('a')
+  option = ARGV.getopts('r')
   directory = ARGV[0] || Dir.getwd
   files = sort_files(directory, option)
   rows = create_rows(files)
@@ -15,8 +15,8 @@ def main
 end
 
 def sort_files(directory, option)
-  a_option = option['a'] ? File::FNM_DOTMATCH : 0
-  Dir.glob('*', a_option, base: directory)
+  files = Dir.glob('*', base: directory)
+  option['r'] ? files.reverse : files
 end
 
 def create_rows(files)
