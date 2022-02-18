@@ -42,28 +42,8 @@ def sort_files(path)
   Dir.glob('*', base: path)
 end
 
-def add_special_permission(permission, special_permission_number)
-  case special_permission_number
-  when '1'
-    permission[-1] = permission[-1] == '-' ? 'T' : 't'
-  when '4'
-    permission[2] = permission[2] == '-' ? 'S' : 's'
-  when '2'
-    permission[5] = permission[5] == '-' ? 'S' : 's'
-  end
-  permission
-end
-
-def convert_to_permission(file)
-  permission_numbers = file.mode.to_s(8)[-3, 3].split('')
-  permission = permission_numbers.map do |i|
-    PERMISSION[i.to_sym]
-  end.join
-  special_permission_number = file.mode.to_s(8)[-4]
-  special_permission_number == '0' ? permission : add_special_permission(permission, special_permission_number)
-end
-
 def output_file_detail(files, path)
+  output_total(files) if files.size > 1
   files.map do |i|
     file = directory?(path) ? File.lstat(File.join(path, i)) : File.lstat(i)
     type = FILE_TYPE[file.ftype.to_sym]
@@ -76,6 +56,31 @@ def output_file_detail(files, path)
     time = "#{file.mtime.strftime('%H')}:#{file.mtime.strftime('%M')}"
     puts "#{type}#{permission} #{nlink} #{user}  #{group} #{size} #{date} #{time} #{i}"
   end
+end
+
+def output_total(_files)
+  puts 'total 0000'
+end
+
+def convert_to_permission(file)
+  permission_numbers = file.mode.to_s(8)[-3, 3].split('')
+  permission = permission_numbers.map do |i|
+    PERMISSION[i.to_sym]
+  end.join
+  special_permission_number = file.mode.to_s(8)[-4]
+  special_permission_number == '0' ? permission : add_special_permission(permission, special_permission_number)
+end
+
+def add_special_permission(permission, special_permission_number)
+  case special_permission_number
+  when '1'
+    permission[-1] = permission[-1] == '-' ? 'T' : 't'
+  when '4'
+    permission[2] = permission[2] == '-' ? 'S' : 's'
+  when '2'
+    permission[5] = permission[5] == '-' ? 'S' : 's'
+  end
+  permission
 end
 
 def output_file_names(files)
