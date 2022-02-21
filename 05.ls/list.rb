@@ -29,23 +29,23 @@ PERMISSION = {
 
 def main
   option = ARGV.getopts('l')
-  path = ARGV[0] || Dir.getwd
-  files = directory?(path) ? sort_files(path) : [] << path
-  option['l'] ? output_file_detail(files, path) : output_file_names(files)
+  argument_path = ARGV[0] || Dir.getwd
+  files = directory?(argument_path) ? sort_files(argument_path) : [] << argument_path
+  option['l'] ? output_file_detail(files, argument_path) : output_file_names(files)
 end
 
-def directory?(path)
-  File.stat(path).directory?
+def directory?(argument_path)
+  File.lstat(argument_path).directory?
 end
 
-def sort_files(path)
-  Dir.glob('*', base: path)
+def sort_files(argument_path)
+  Dir.glob('*', base: argument_path)
 end
 
-def output_file_detail(files, path)
-  output_total(files) if files.size > 1
-  files.map do |i|
-    file = directory?(path) ? File.lstat(File.join(path, i)) : File.lstat(i)
+def output_file_detail(files, argument_path)
+  output_total_blocks(files, argument_path) if files.size > 1
+  files.each do |i|
+    file = directory?(argument_path) ? File.lstat(File.join(argument_path, i)) : File.lstat(i)
     type = FILE_TYPE[file.ftype.to_sym]
     permission = convert_to_permission(file)
     nlink = file.nlink.to_s.rjust(2)
@@ -58,8 +58,11 @@ def output_file_detail(files, path)
   end
 end
 
-def output_total(_files)
-  puts 'total 0000'
+def output_total_blocks(files, argument_path)
+  total_blocks = files.map do |i|
+    File.lstat(File.join(argument_path, i)).blocks
+  end.inject(:+)
+  puts "total #{total_blocks}"
 end
 
 def convert_to_permission(file)
