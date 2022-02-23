@@ -30,7 +30,7 @@ PERMISSION = {
 def main
   option = ARGV.getopts('l')
   argument_path = ARGV[0] || Dir.getwd
-  files = directory?(argument_path) ? sort_files(argument_path) : [] << argument_path
+  files = directory?(argument_path) ? select_files(argument_path) : [argument_path]
   option['l'] ? output_file_detail(files, argument_path) : output_file_names(files)
 end
 
@@ -38,7 +38,7 @@ def directory?(argument_path)
   File.lstat(argument_path).directory?
 end
 
-def sort_files(argument_path)
+def select_files(argument_path)
   Dir.glob('*', base: argument_path)
 end
 
@@ -61,21 +61,21 @@ end
 def output_total_blocks(files, argument_path)
   total_blocks = files.map do |i|
     File.lstat(File.join(argument_path, i)).blocks
-  end.inject(:+)
+  end.sum
   puts "total #{total_blocks}"
 end
 
 def convert_to_permission(file)
-  permission_numbers = file.mode.to_s(8)[-3, 3].split('')
-  permission = permission_numbers.map do |i|
+  permission_digits = file.mode.to_s(8)[-3, 3].split('')
+  permission = permission_digits.map do |i|
     PERMISSION[i.to_sym]
   end.join
-  special_permission_number = file.mode.to_s(8)[-4]
-  special_permission_number == '0' ? permission : add_special_permission(permission, special_permission_number)
+  special_permission_digit = file.mode.to_s(8)[-4]
+  special_permission_digit == '0' ? permission : add_special_permission(permission, special_permission_digit)
 end
 
-def add_special_permission(permission, special_permission_number)
-  case special_permission_number
+def add_special_permission(permission, special_permission_digit)
+  case special_permission_digit
   when '1'
     permission[-1] = permission[-1] == '-' ? 'T' : 't'
   when '4'
