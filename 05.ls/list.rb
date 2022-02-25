@@ -26,6 +26,16 @@ PERMISSION = {
   '6': 'rw-',
   '7': 'rwx'
 }.freeze
+DIGIT_TO_INDEX = {
+  '1': -1,
+  '4': 2,
+  '2': 5
+}.freeze
+DIGIT_TO_PERMISSION = {
+  '1': 't',
+  '4': 's',
+  '2': 's'
+}.freeze
 
 def main
   option = ARGV.getopts('l')
@@ -75,14 +85,9 @@ def convert_to_permission(file)
 end
 
 def add_special_permission(permission, special_permission_digit)
-  case special_permission_digit
-  when '1'
-    permission[-1] = permission[-1] == '-' ? 'T' : 't'
-  when '4'
-    permission[2] = permission[2] == '-' ? 'S' : 's'
-  when '2'
-    permission[5] = permission[5] == '-' ? 'S' : 's'
-  end
+  update_index = DIGIT_TO_INDEX[special_permission_digit.to_sym]
+  special_permission = DIGIT_TO_PERMISSION[special_permission_digit.to_sym]
+  permission[update_index] = permission[update_index] == '-' ? special_permission.upcase : special_permission
   permission
 end
 
