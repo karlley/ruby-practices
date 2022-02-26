@@ -38,10 +38,10 @@ DIGIT_TO_PERMISSION = {
 }.freeze
 
 def main
-  option = ARGV.getopts('l')
+  options = ARGV.getopts('arl')
   argument_path = ARGV[0] || Dir.getwd
   files = directory?(argument_path) ? select_files(argument_path) : [argument_path]
-  option['l'] ? output_file_detail(files, argument_path) : output_file_names(files)
+  options['l'] ? output_file_detail(files, argument_path) : output_file_names(files)
 end
 
 def directory?(argument_path)
