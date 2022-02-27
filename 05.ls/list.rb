@@ -46,7 +46,7 @@ end
 
 def select_files(argument_path, options)
   selected_files =
-    if directory?(argument_path)
+    if File.lstat(argument_path).directory?
       Dir.glob('*', options['a'] ? File::FNM_DOTMATCH : 0, base: argument_path)
     else
       [argument_path]
@@ -54,14 +54,10 @@ def select_files(argument_path, options)
   options['r'] ? selected_files.reverse : selected_files
 end
 
-def directory?(argument_path)
-  File.lstat(argument_path).directory?
-end
-
 def output_file_detail(files, argument_path)
   output_total_blocks(files, argument_path) if files.size > 1
   files.each do |i|
-    file = directory?(argument_path) ? File.lstat(File.join(argument_path, i)) : File.lstat(i)
+    file = File.lstat(argument_path).directory? ? File.lstat(File.join(argument_path, i)) : File.lstat(i)
     type = FILE_TYPE[file.ftype.to_sym]
     permission = convert_to_permission(file)
     nlink = file.nlink.to_s.rjust(2)
