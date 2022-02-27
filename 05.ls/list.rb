@@ -45,11 +45,13 @@ def main
 end
 
 def select_files(argument_path, options)
-  if directory?(argument_path)
-    Dir.glob('*', options['a'] ? File::FNM_DOTMATCH : 0, base: argument_path)
-  else
-    [argument_path]
-  end
+  selected_files =
+    if directory?(argument_path)
+      Dir.glob('*', options['a'] ? File::FNM_DOTMATCH : 0, base: argument_path)
+    else
+      [argument_path]
+    end
+  options['r'] ? selected_files.reverse : selected_files
 end
 
 def directory?(argument_path)
