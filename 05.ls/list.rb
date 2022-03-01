@@ -40,18 +40,16 @@ DIGIT_TO_PERMISSION = {
 def main
   options = ARGV.getopts('arl')
   path = ARGV[0] || Dir.getwd
-  files = select_files(path, options)
+  files = select_files(path, all: options['a'], reverse: options['r'])
   options['l'] ? output_file_detail(files, path) : output_file_names(files)
 end
 
-def select_files(path, options)
-  selected_files =
-    if File.lstat(path).directory?
-      Dir.glob('*', options['a'] ? File::FNM_DOTMATCH : 0, base: path)
-    else
-      [path]
-    end
-  options['r'] ? selected_files.reverse : selected_files
+def select_files(path, all: false, reverse: false)
+  return [path] unless File.lstat(path).directory?
+
+  select_option = all ? File::FNM_DOTMATCH : 0
+  selected_files = Dir.glob('*', select_option, base: path)
+  reverse ? selected_files.reverse : selected_files
 end
 
 def output_file_detail(files, path)
