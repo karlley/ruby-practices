@@ -38,24 +38,24 @@ DIGIT_TO_PERMISSION = {
 }.freeze
 
 def main
-  option = ARGV.getopts('l')
-  argument_path = ARGV[0] || Dir.getwd
-  files = directory?(argument_path) ? select_files(argument_path) : [argument_path]
-  option['l'] ? output_file_detail(files, argument_path) : output_file_names(files)
+  options = ARGV.getopts('arl')
+  path = ARGV[0] || Dir.getwd
+  files = select_files(path, all: options['a'], reverse: options['r'])
+  options['l'] ? output_file_detail(files, path) : output_file_names(files)
 end
 
-def directory?(argument_path)
-  File.lstat(argument_path).directory?
+def select_files(path, all: false, reverse: false)
+  return [path] unless File.lstat(path).directory?
+
+  select_option = all ? File::FNM_DOTMATCH : 0
+  selected_files = Dir.glob('*', select_option, base: path)
+  reverse ? selected_files.reverse : selected_files
 end
 
-def select_files(argument_path)
-  Dir.glob('*', base: argument_path)
-end
-
-def output_file_detail(files, argument_path)
-  output_total_blocks(files, argument_path) if files.size > 1
+def output_file_detail(files, path)
+  output_total_blocks(files, path) if files.size > 1
   files.each do |i|
-    file = directory?(argument_path) ? File.lstat(File.join(argument_path, i)) : File.lstat(i)
+    file = File.lstat(path).directory? ? File.lstat(File.join(path, i)) : File.lstat(i)
     type = FILE_TYPE[file.ftype.to_sym]
     permission = convert_to_permission(file)
     nlink = file.nlink.to_s.rjust(2)
@@ -68,9 +68,9 @@ def output_file_detail(files, argument_path)
   end
 end
 
-def output_total_blocks(files, argument_path)
+def output_total_blocks(files, path)
   total_blocks = files.map do |i|
-    File.lstat(File.join(argument_path, i)).blocks
+    File.lstat(File.join(path, i)).blocks
   end.sum
   puts "total #{total_blocks}"
 end
