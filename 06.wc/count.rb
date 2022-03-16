@@ -33,13 +33,15 @@ def count_texts(texts)
   texts.each do |text|
     text_detail = {}
     text_detail[:file_name] = text[:file_name]
-    text_detail[:line_count] = text[:text].size
+    line_counts = []
     word_counts = []
     byte_counts = []
     text[:text].each do |line|
+      line_counts << line.count("\n")
       word_counts << line.split.size
-      byte_counts << line.split(//).size
+      byte_counts << line.bytesize
     end
+    text_detail[:line_count] = line_counts.sum
     text_detail[:word_count] = word_counts.sum
     text_detail[:byte_count] = byte_counts.sum
     text_details << text_detail
