@@ -7,7 +7,8 @@ def main
   option = ARGV.getopts('l')
   texts = ARGV.size >= 1 ? read_argv : read_stdin
   text_details = count_texts(texts)
-  output_text_details(text_details, option)
+  total = count_texts_total(text_details)
+  output_text_details(text_details, total, option)
 end
 
 def read_argv
@@ -49,7 +50,23 @@ def count_texts(texts)
   text_details
 end
 
-def output_text_details(text_details, option)
+def count_texts_total(text_details)
+  line_count_totals = []
+  word_count_totals = []
+  byte_count_totals = []
+  text_details.each do |text|
+    line_count_totals << text[:line_count]
+    word_count_totals << text[:word_count]
+    byte_count_totals << text[:byte_count]
+  end
+  total = {}
+  total[:line_count] = line_count_totals.sum
+  total[:word_count] = word_count_totals.sum
+  total[:byte_count] = byte_count_totals.sum
+  total
+end
+
+def output_text_details(text_details, total, option)
   text_details.each do |text|
     if option['l']
       puts "#{text[:line_count].to_s.rjust(8)} #{text[:file_name]}"
@@ -57,22 +74,10 @@ def output_text_details(text_details, option)
       puts "#{text[:line_count].to_s.rjust(8)}#{text[:word_count].to_s.rjust(8)}#{text[:byte_count].to_s.rjust(8)} #{text[:file_name]}"
     end
   end
-  output_total(text_details, option) if text_details.size > 1
+  output_total(total, option) if text_details.size > 1
 end
 
-def output_total(text_details, option)
-  line_counts = []
-  word_counts = []
-  byte_counts = []
-  text_details.each do |text|
-    line_counts << text[:line_count]
-    word_counts << text[:word_count]
-    byte_counts << text[:byte_count]
-  end
-  total = {}
-  total[:line_count] = line_counts.sum
-  total[:word_count] = word_counts.sum
-  total[:byte_count] = byte_counts.sum
+def output_total(total, option)
   if option['l']
     puts "#{total[:line_count].to_s.rjust(8)} total"
   else
