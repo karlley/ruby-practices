@@ -12,14 +12,12 @@ def main
 end
 
 def read_argv
-  texts = []
-  ARGV.each do |file|
+  ARGV.map do |file|
     text = {}
     text[:text] = File.readlines(file)
     text[:file_name] = file
-    texts << text
+    text
   end
-  texts
 end
 
 def read_stdin
