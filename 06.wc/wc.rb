@@ -5,37 +5,37 @@ require 'optparse'
 
 def main
   option = ARGV.getopts('l')
-  texts = ARGV.size >= 1 ? read_argv : read_stdin
-  text_details = count_texts(texts)
+  file_tables = ARGV.size >= 1 ? read_argv : read_stdin
+  text_details = count_texts(file_tables)
   total = count_texts_total(text_details)
   output_text_details(text_details, total, option)
 end
 
 def read_argv
-  ARGV.map do |file|
-    text = {}
-    text[:text] = File.readlines(file)
-    text[:file_name] = file
-    text
+  ARGV.map do |i|
+    file_table = {}
+    file_table[:lines] = File.readlines(i)
+    file_table[:file_name] = i
+    file_table
   end
 end
 
 def read_stdin
-  text = {}
-  text[:text] = $stdin.readlines
-  text[:file_name] = nil
-  [text]
+  file_table = {}
+  file_table[:lines] = $stdin.readlines
+  file_table[:file_name] = nil
+  [file_table]
 end
 
-def count_texts(texts)
+def count_texts(file_tables)
   text_details = []
-  texts.each do |text|
+  file_tables.each do |file|
     text_detail = {}
-    text_detail[:file_name] = text[:file_name]
+    text_detail[:file_name] = file[:file_name]
     line_counts = []
     word_counts = []
     byte_counts = []
-    text[:text].each do |line|
+    file[:lines].each do |line|
       line_counts << line.count("\n")
       word_counts << line.split.size
       byte_counts << line.bytesize
