@@ -6,9 +6,9 @@ require 'optparse'
 def main
   option = ARGV.getopts('l')
   file_tables = ARGV.size >= 1 ? read_argv : read_stdin
-  text_details = count_texts(file_tables)
-  total = count_texts_total(text_details)
-  output_text_details(text_details, total, option)
+  count_tables = count_file_tables(file_tables)
+  total_count_tables = total_count_tables(count_tables)
+  output_count_tables(count_tables, total_count_tables, option)
 end
 
 def read_argv
@@ -27,11 +27,11 @@ def read_stdin
   [file_table]
 end
 
-def count_texts(file_tables)
-  text_details = []
+def count_file_tables(file_tables)
+  count_tables = []
   file_tables.each do |file|
-    text_detail = {}
-    text_detail[:file_name] = file[:file_name]
+    count_table = {}
+    count_table[:file_name] = file[:file_name]
     line_counts = []
     word_counts = []
     byte_counts = []
@@ -40,22 +40,22 @@ def count_texts(file_tables)
       word_counts << line.split.size
       byte_counts << line.bytesize
     end
-    text_detail[:line_count] = line_counts.sum
-    text_detail[:word_count] = word_counts.sum
-    text_detail[:byte_count] = byte_counts.sum
-    text_details << text_detail
+    count_table[:line_count] = line_counts.sum
+    count_table[:word_count] = word_counts.sum
+    count_table[:byte_count] = byte_counts.sum
+    count_tables << count_table
   end
-  text_details
+  count_tables
 end
 
-def count_texts_total(text_details)
+def total_count_tables(count_tables)
   line_count_totals = []
   word_count_totals = []
   byte_count_totals = []
-  text_details.each do |text|
-    line_count_totals << text[:line_count]
-    word_count_totals << text[:word_count]
-    byte_count_totals << text[:byte_count]
+  count_tables.each do |i|
+    line_count_totals << i[:line_count]
+    word_count_totals << i[:word_count]
+    byte_count_totals << i[:byte_count]
   end
   total = {}
   total[:line_count] = line_count_totals.sum
@@ -64,22 +64,22 @@ def count_texts_total(text_details)
   total
 end
 
-def output_text_details(text_details, total, option)
-  text_details.each do |text|
+def output_count_tables(count_tables, total_count_tables, option)
+  count_tables.each do |i|
     if option['l']
-      puts "#{text[:line_count].to_s.rjust(8)} #{text[:file_name]}"
+      puts "#{i[:line_count].to_s.rjust(8)} #{i[:file_name]}"
     else
-      puts "#{text[:line_count].to_s.rjust(8)}#{text[:word_count].to_s.rjust(8)}#{text[:byte_count].to_s.rjust(8)} #{text[:file_name]}"
+      puts "#{i[:line_count].to_s.rjust(8)}#{i[:word_count].to_s.rjust(8)}#{i[:byte_count].to_s.rjust(8)} #{i[:file_name]}"
     end
   end
-  output_total(total, option) if text_details.size > 1
+  output_total_count_tables(total_count_tables, option) if count_tables.size > 1
 end
 
-def output_total(total, option)
+def output_total_count_tables(total_count_tables, option)
   if option['l']
-    puts "#{total[:line_count].to_s.rjust(8)} total"
+    puts "#{total_count_tables[:line_count].to_s.rjust(8)} total"
   else
-    puts "#{total[:line_count].to_s.rjust(8)}#{total[:word_count].to_s.rjust(8)}#{total[:byte_count].to_s.rjust(8)} total"
+    puts "#{total_count_tables[:line_count].to_s.rjust(8)}#{total_count_tables[:word_count].to_s.rjust(8)}#{total_count_tables[:byte_count].to_s.rjust(8)} total"
   end
 end
 
