@@ -32,36 +32,30 @@ def count_file_tables(file_tables)
   file_tables.each do |file|
     count_table = {}
     count_table[:file_name] = file[:file_name]
-    line_counts = []
-    word_counts = []
-    byte_counts = []
+    count_table[:line_count] = 0
+    count_table[:word_count] = 0
+    count_table[:byte_count] = 0
     file[:lines].each do |line|
-      line_counts << line.count("\n")
-      word_counts << line.split.size
-      byte_counts << line.bytesize
+      count_table[:line_count] += line.count("\n")
+      count_table[:word_count] += line.split.size
+      count_table[:byte_count] += line.bytesize
     end
-    count_table[:line_count] = line_counts.sum
-    count_table[:word_count] = word_counts.sum
-    count_table[:byte_count] = byte_counts.sum
     count_tables << count_table
   end
   count_tables
 end
 
 def total_count_tables(count_tables)
-  line_count_totals = []
-  word_count_totals = []
-  byte_count_totals = []
+  total_count_tables = {}
+  total_count_tables[:line_count] = 0
+  total_count_tables[:word_count] = 0
+  total_count_tables[:byte_count] = 0
   count_tables.each do |i|
-    line_count_totals << i[:line_count]
-    word_count_totals << i[:word_count]
-    byte_count_totals << i[:byte_count]
+    total_count_tables[:line_count] += i[:line_count]
+    total_count_tables[:word_count] += i[:word_count]
+    total_count_tables[:byte_count] += i[:byte_count]
   end
-  total = {}
-  total[:line_count] = line_count_totals.sum
-  total[:word_count] = word_count_totals.sum
-  total[:byte_count] = byte_count_totals.sum
-  total
+  total_count_tables
 end
 
 def output_count_tables(count_tables, total_count_tables, option)
