@@ -3,6 +3,8 @@
 
 require 'optparse'
 
+CHARACTER_WIDTH = 8
+
 def main
   option = ARGV.getopts('l')
   file_tables = ARGV.size >= 1 ? read_argv : read_stdin
@@ -61,9 +63,9 @@ end
 def output_count_tables(count_tables, total_count_tables, option)
   count_tables.each do |i|
     if option['l']
-      puts "#{i[:line_count].to_s.rjust(8)} #{i[:file_name]}"
+      puts "#{convert_to_string(i[:line_count])} #{i[:file_name]}"
     else
-      puts "#{i[:line_count].to_s.rjust(8)}#{i[:word_count].to_s.rjust(8)}#{i[:byte_count].to_s.rjust(8)} #{i[:file_name]}"
+      puts "#{convert_to_string(i[:line_count])}#{convert_to_string(i[:word_count])}#{convert_to_string(i[:byte_count])} #{i[:file_name]}"
     end
   end
   output_total_count_tables(total_count_tables, option) if count_tables.size > 1
@@ -71,10 +73,14 @@ end
 
 def output_total_count_tables(total_count_tables, option)
   if option['l']
-    puts "#{total_count_tables[:line_count].to_s.rjust(8)} total"
+    puts "#{convert_to_string(total_count_tables[:line_count])} total"
   else
-    puts "#{total_count_tables[:line_count].to_s.rjust(8)}#{total_count_tables[:word_count].to_s.rjust(8)}#{total_count_tables[:byte_count].to_s.rjust(8)} total"
+    puts "#{convert_to_string(total_count_tables[:line_count])}#{convert_to_string(total_count_tables[:word_count])}#{convert_to_string(total_count_tables[:byte_count])} total"
   end
+end
+
+def convert_to_string(count_number)
+  count_number.to_s.rjust(CHARACTER_WIDTH)
 end
 
 main
