@@ -65,7 +65,11 @@ def output_count_tables(count_tables, total_count_tables, option)
     if option['l']
       puts "#{convert_to_string(i[:line_count])} #{i[:file_name]}"
     else
-      puts "#{convert_to_string(i[:line_count])}#{convert_to_string(i[:word_count])}#{convert_to_string(i[:byte_count])} #{i[:file_name]}"
+      puts <<~COUNT
+        #{convert_to_string(i[:line_count])}\
+        #{convert_to_string(i[:word_count])}\
+        #{convert_to_string(i[:byte_count])} #{i[:file_name]}
+      COUNT
     end
   end
   output_total_count_tables(total_count_tables, option) if count_tables.size > 1
@@ -75,7 +79,11 @@ def output_total_count_tables(total_count_tables, option)
   if option['l']
     puts "#{convert_to_string(total_count_tables[:line_count])} total"
   else
-    puts "#{convert_to_string(total_count_tables[:line_count])}#{convert_to_string(total_count_tables[:word_count])}#{convert_to_string(total_count_tables[:byte_count])} total"
+    puts <<~TOTAL
+      #{convert_to_string(total_count_tables[:line_count])}\
+      #{convert_to_string(total_count_tables[:word_count])}\
+      #{convert_to_string(total_count_tables[:byte_count])} total
+    TOTAL
   end
 end
 
