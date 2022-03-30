@@ -9,8 +9,8 @@ def main
   option = ARGV.getopts('l')
   file_tables = ARGV.size >= 1 ? read_argv : read_stdin
   count_tables = count_file_tables(file_tables)
-  total_count_tables = total_count_tables(count_tables)
-  output_count_tables(count_tables, total_count_tables, option)
+  output_count_tables(count_tables, option)
+  output_total_tables(count_tables, option) if file_tables.size > 1
 end
 
 def read_argv
@@ -60,7 +60,7 @@ def total_count_tables(count_tables)
   total_count_tables
 end
 
-def output_count_tables(count_tables, total_count_tables, option)
+def output_count_tables(count_tables, option)
   count_tables.each do |i|
     if option['l']
       puts "#{convert_to_string(i[:line_count])} #{i[:file_name]}"
@@ -72,17 +72,17 @@ def output_count_tables(count_tables, total_count_tables, option)
       COUNT
     end
   end
-  output_total_count_tables(total_count_tables, option) if count_tables.size > 1
 end
 
-def output_total_count_tables(total_count_tables, option)
+def output_total_tables(count_tables, option)
+  total_tables = total_count_tables(count_tables)
   if option['l']
-    puts "#{convert_to_string(total_count_tables[:line_count])} total"
+    puts "#{convert_to_string(total_tables[:line_count])} total"
   else
     puts <<~TOTAL
-      #{convert_to_string(total_count_tables[:line_count])}\
-      #{convert_to_string(total_count_tables[:word_count])}\
-      #{convert_to_string(total_count_tables[:byte_count])} total
+      #{convert_to_string(total_tables[:line_count])}\
+      #{convert_to_string(total_tables[:word_count])}\
+      #{convert_to_string(total_tables[:byte_count])} total
     TOTAL
   end
 end
