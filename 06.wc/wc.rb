@@ -14,10 +14,10 @@ def main
 end
 
 def read_argv
-  ARGV.map do |i|
+  ARGV.map do |file|
     file_table = {}
-    file_table[:lines] = File.readlines(i)
-    file_table[:file_name] = i
+    file_table[:lines] = File.readlines(file)
+    file_table[:file_name] = file
     file_table
   end
 end
@@ -52,23 +52,23 @@ def total_count_tables(count_tables)
   total_count_tables[:line_count] = 0
   total_count_tables[:word_count] = 0
   total_count_tables[:byte_count] = 0
-  count_tables.each do |i|
-    total_count_tables[:line_count] += i[:line_count]
-    total_count_tables[:word_count] += i[:word_count]
-    total_count_tables[:byte_count] += i[:byte_count]
+  count_tables.each do |count_table|
+    total_count_tables[:line_count] += count_table[:line_count]
+    total_count_tables[:word_count] += count_table[:word_count]
+    total_count_tables[:byte_count] += count_table[:byte_count]
   end
   total_count_tables
 end
 
 def output_count_tables(count_tables, option)
-  count_tables.each do |i|
+  count_tables.each do |count_table|
     if option['l']
-      puts "#{convert_to_string(i[:line_count])} #{i[:file_name]}"
+      puts "#{convert_to_string(count_table[:line_count])} #{count_table[:file_name]}"
     else
       puts <<~COUNT
-        #{convert_to_string(i[:line_count])}\
-        #{convert_to_string(i[:word_count])}\
-        #{convert_to_string(i[:byte_count])} #{i[:file_name]}
+        #{convert_to_string(count_table[:line_count])}\
+        #{convert_to_string(count_table[:word_count])}\
+        #{convert_to_string(count_table[:byte_count])} #{count_table[:file_name]}
       COUNT
     end
   end
