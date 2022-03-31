@@ -42,19 +42,6 @@ def count_file_tables(file_tables)
   end
 end
 
-def total_count_tables(count_tables)
-  total_count_tables = {}
-  total_count_tables[:line_count] = 0
-  total_count_tables[:word_count] = 0
-  total_count_tables[:byte_count] = 0
-  count_tables.each do |count_table|
-    total_count_tables[:line_count] += count_table[:line_count]
-    total_count_tables[:word_count] += count_table[:word_count]
-    total_count_tables[:byte_count] += count_table[:byte_count]
-  end
-  total_count_tables
-end
-
 def output_count_tables(count_tables, option)
   count_tables.each do |count_table|
     if option['l']
@@ -80,6 +67,19 @@ def output_total_tables(count_tables, option)
       #{convert_to_string(total_tables[:byte_count])} total
     TOTAL
   end
+end
+
+def total_count_tables(count_tables)
+  total_count_tables = {}
+  total_count_tables[:line_count] = 0
+  total_count_tables[:word_count] = 0
+  total_count_tables[:byte_count] = 0
+  count_tables.each do |count_table|
+    total_count_tables[:line_count] += count_table[:line_count]
+    total_count_tables[:word_count] += count_table[:word_count]
+    total_count_tables[:byte_count] += count_table[:byte_count]
+  end
+  total_count_tables
 end
 
 def convert_to_string(count_number)
