@@ -30,21 +30,16 @@ def read_stdin
 end
 
 def count_file_tables(file_tables)
-  count_tables = []
-  file_tables.each do |file|
-    count_table = {}
-    count_table[:file_name] = file[:file_name]
-    count_table[:line_count] = 0
-    count_table[:word_count] = 0
-    count_table[:byte_count] = 0
-    file[:lines].each do |line|
+  file_tables.map do |file_table|
+    count_table = { line_count: 0, word_count: 0, byte_count: 0 }
+    count_table[:file_name] = file_table[:file_name]
+    file_table[:lines].each do |line|
       count_table[:line_count] += line.count("\n")
       count_table[:word_count] += line.split.size
       count_table[:byte_count] += line.bytesize
     end
-    count_tables << count_table
+    count_table
   end
-  count_tables
 end
 
 def total_count_tables(count_tables)
