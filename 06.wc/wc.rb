@@ -57,29 +57,26 @@ def output_count_tables(count_tables, option)
 end
 
 def output_total_tables(count_tables, option)
-  total_tables = total_count_tables(count_tables)
+  total_table = sum_count_tables(count_tables)
   if option['l']
-    puts "#{convert_to_string(total_tables[:line_count])} total"
+    puts "#{convert_to_string(total_table[:line_count])} total"
   else
     puts <<~TOTAL
-      #{convert_to_string(total_tables[:line_count])}\
-      #{convert_to_string(total_tables[:word_count])}\
-      #{convert_to_string(total_tables[:byte_count])} total
+      #{convert_to_string(total_table[:line_count])}\
+      #{convert_to_string(total_table[:word_count])}\
+      #{convert_to_string(total_table[:byte_count])} total
     TOTAL
   end
 end
 
-def total_count_tables(count_tables)
-  total_count_tables = {}
-  total_count_tables[:line_count] = 0
-  total_count_tables[:word_count] = 0
-  total_count_tables[:byte_count] = 0
+def sum_count_tables(count_tables)
+  total_table = { line_count: 0, word_count: 0, byte_count: 0 }
   count_tables.each do |count_table|
-    total_count_tables[:line_count] += count_table[:line_count]
-    total_count_tables[:word_count] += count_table[:word_count]
-    total_count_tables[:byte_count] += count_table[:byte_count]
+    total_table[:line_count] += count_table[:line_count]
+    total_table[:word_count] += count_table[:word_count]
+    total_table[:byte_count] += count_table[:byte_count]
   end
-  total_count_tables
+  total_table
 end
 
 def convert_to_string(count_number)
