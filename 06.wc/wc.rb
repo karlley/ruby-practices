@@ -45,12 +45,12 @@ end
 def output_count_tables(count_tables, option)
   count_tables.each do |count_table|
     if option['l']
-      puts "#{convert_to_string(count_table[:line_count])} #{count_table[:file_name]}"
+      puts "#{format_number(count_table[:line_count])} #{count_table[:file_name]}"
     else
       puts <<~COUNT
-        #{convert_to_string(count_table[:line_count])}\
-        #{convert_to_string(count_table[:word_count])}\
-        #{convert_to_string(count_table[:byte_count])} #{count_table[:file_name]}
+        #{format_number(count_table[:line_count])}\
+        #{format_number(count_table[:word_count])}\
+        #{format_number(count_table[:byte_count])} #{count_table[:file_name]}
       COUNT
     end
   end
@@ -59,12 +59,12 @@ end
 def output_total_tables(count_tables, option)
   total_table = sum_count_tables(count_tables)
   if option['l']
-    puts "#{convert_to_string(total_table[:line_count])} total"
+    puts "#{format_number(total_table[:line_count])} total"
   else
     puts <<~TOTAL
-      #{convert_to_string(total_table[:line_count])}\
-      #{convert_to_string(total_table[:word_count])}\
-      #{convert_to_string(total_table[:byte_count])} total
+      #{format_number(total_table[:line_count])}\
+      #{format_number(total_table[:word_count])}\
+      #{format_number(total_table[:byte_count])} total
     TOTAL
   end
 end
@@ -79,7 +79,7 @@ def sum_count_tables(count_tables)
   total_table
 end
 
-def convert_to_string(count_number)
+def format_number(count_number)
   count_number.to_s.rjust(CHARACTER_WIDTH)
 end
 
