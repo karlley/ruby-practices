@@ -47,11 +47,9 @@ def output_count_tables(count_tables, option)
     if option['l']
       puts "#{format_number(count_table[:line_count])} #{count_table[:file_name]}"
     else
-      puts <<~COUNT
-        #{format_number(count_table[:line_count])}\
-        #{format_number(count_table[:word_count])}\
-        #{format_number(count_table[:byte_count])} #{count_table[:file_name]}
-      COUNT
+      puts "#{format_number(count_table[:line_count])}"\
+            "#{format_number(count_table[:word_count])}"\
+            "#{format_number(count_table[:byte_count])} #{count_table[:file_name]}"
     end
   end
 end
@@ -61,11 +59,9 @@ def output_total_tables(count_tables, option)
   if option['l']
     puts "#{format_number(total_table[:line_count])} total"
   else
-    puts <<~TOTAL
-      #{format_number(total_table[:line_count])}\
-      #{format_number(total_table[:word_count])}\
-      #{format_number(total_table[:byte_count])} total
-    TOTAL
+    puts "#{format_number(total_table[:line_count])}"\
+          "#{format_number(total_table[:word_count])}"\
+          "#{format_number(total_table[:byte_count])} total"
   end
 end
 
