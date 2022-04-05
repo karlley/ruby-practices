@@ -9,8 +9,7 @@ def main
   option = ARGV.getopts('l')
   file_tables = ARGV.size >= 1 ? read_argv : read_stdin
   count_tables = count_file_tables(file_tables)
-  output_count_tables(count_tables, option)
-  output_total_tables(count_tables, option) if file_tables.size > 1
+  output_count_tables(option, file_tables, count_tables)
 end
 
 def read_argv
@@ -42,31 +41,28 @@ def count_file_tables(file_tables)
   end
 end
 
-def output_count_tables(count_tables, option)
+def output_count_tables(option, file_tables, count_tables)
   count_tables.each do |count_table|
-    if option['l']
-      puts "#{format_number(count_table[:line_count])} #{count_table[:file_name]}"
-    else
-      puts "#{format_number(count_table[:line_count])}"\
-            "#{format_number(count_table[:word_count])}"\
-            "#{format_number(count_table[:byte_count])} #{count_table[:file_name]}"
-    end
+    show_table(count_table, option)
   end
+  return unless file_tables.size > 1
+
+  total_table = sum_count_tables(count_tables)
+  show_table(total_table, option)
 end
 
-def output_total_tables(count_tables, option)
-  total_table = sum_count_tables(count_tables)
+def show_table(output_table, option)
   if option['l']
-    puts "#{format_number(total_table[:line_count])} total"
+    puts "#{format_number(output_table[:line_count])} #{output_table[:file_name]}"
   else
-    puts "#{format_number(total_table[:line_count])}"\
-          "#{format_number(total_table[:word_count])}"\
-          "#{format_number(total_table[:byte_count])} total"
+    puts "#{format_number(output_table[:line_count])}"\
+          "#{format_number(output_table[:word_count])}"\
+          "#{format_number(output_table[:byte_count])} #{output_table[:file_name]}"
   end
 end
 
 def sum_count_tables(count_tables)
-  total_table = { line_count: 0, word_count: 0, byte_count: 0 }
+  total_table = { line_count: 0, word_count: 0, byte_count: 0, file_name: 'total' }
   count_tables.each do |count_table|
     total_table[:line_count] += count_table[:line_count]
     total_table[:word_count] += count_table[:word_count]
