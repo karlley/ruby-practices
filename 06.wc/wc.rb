@@ -54,9 +54,10 @@ def show_table(output_table, option)
   if option['l']
     puts "#{format_number(output_table[:line_count])} #{output_table[:file_name]}"
   else
-    puts "#{format_number(output_table[:line_count])}"\
-          "#{format_number(output_table[:word_count])}"\
-          "#{format_number(output_table[:byte_count])} #{output_table[:file_name]}"
+    print format_number(output_table[:line_count])
+    print format_number(output_table[:word_count])
+    print format_number(output_table[:byte_count])
+    puts " #{output_table[:file_name]}"
   end
 end
 
