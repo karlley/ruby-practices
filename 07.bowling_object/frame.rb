@@ -11,6 +11,14 @@ class Frame
     @third_shot = Shot.new(marks[2])
   end
 
+  def strike?
+    first_shot.score == 10
+  end
+
+  def spare?
+    first_shot.score < 10 && first_shot.score + second_shot.score == 10
+  end
+
   def score
     [@first_shot, @second_shot, @third_shot].compact.sum(&:score)
   end

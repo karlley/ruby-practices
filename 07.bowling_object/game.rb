@@ -9,13 +9,14 @@ class Game
   end
 
   def total_score
-    frame_scores = @frames.each_with_index.map do |frame, index|
+    @frames.each_with_index.sum do |frame, index|
+      next_frame = @frames[index + 1]
       if index <= 8
-        if double_strike?(frame, index)
+        if double_strike?(frame, next_frame)
           double_strike_score(frame, index)
-        elsif strike?(frame)
+        elsif frame.strike?
           strike_score(frame, index)
-        elsif spare?(frame)
+        elsif frame.spare?
           spare_score(frame, index)
         else
           frame.score
@@ -24,7 +25,6 @@ class Game
         frame.score
       end
     end
-    frame_scores.sum
   end
 
   private
@@ -42,16 +42,12 @@ class Game
     to_9_frames << last_frame
   end
 
-  def double_strike?(frame, index)
-    frame.first_shot.score == 10 && @frames[index + 1].first_shot.score == 10
-  end
+  # def double_strike?(frame, index)
+  #   frame.first_shot.score == 10 && @frames[index + 1].first_shot.score == 10
+  # end
 
-  def strike?(frame)
-    frame.first_shot.score == 10
-  end
-
-  def spare?(frame)
-    frame.score == 10
+  def double_strike?(frame, next_frame)
+    frame.strike? && next_frame.strike?
   end
 
   # 次の2投球を加算
