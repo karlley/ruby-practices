@@ -10,14 +10,17 @@ class Game
 
   def total_score
     @frames.each_with_index.sum do |frame, index|
-      next_frame = @frames[index + 1]
       if index <= 8
-        if double_strike?(frame, next_frame)
-          double_strike_score(frame, index)
-        elsif frame.strike?
-          strike_score(frame, index)
-        elsif frame.spare?
-          spare_score(frame, index)
+        next_frame = @frames[index + 1]
+        next_next_frame = @frames[index + 2]
+
+        case
+        when double_strike?(frame, next_frame)
+          double_strike_score(frame, next_frame, next_next_frame)
+        when frame.strike?
+          strike_score(frame, next_frame)
+        when frame.spare?
+          spare_score(frame, next_frame)
         else
           frame.score
         end
@@ -42,36 +45,23 @@ class Game
     to_9_frames << last_frame
   end
 
-  # def double_strike?(frame, index)
-  #   frame.first_shot.score == 10 && @frames[index + 1].first_shot.score == 10
-  # end
-
   def double_strike?(frame, next_frame)
     frame.strike? && next_frame.strike?
   end
 
-  # 次の2投球を加算
-  def double_strike_score(frame, index)
-    frame.score + @frames[index + 1].first_shot.score + next_frame_score(index)
+  def double_strike_score(frame, next_frame, next_next_frame)
+    frame.score + next_frame.first_shot.score + third_shot_score(next_frame, next_next_frame)
   end
 
-  # 9フレーム: 次のフレーム2投目
-  # 1-8フレーム: 次の次のフレームの投球
-  def next_frame_score(index)
-    if index == 8
-      @frames[index + 1].second_shot.score
-    else
-      @frames[index + 2].first_shot.score
-    end
+  def third_shot_score(next_frame, next_next_frame)
+    next_next_frame.nil? ? next_frame.second_shot.score : next_next_frame.first_shot.score
   end
 
-  # 次のフレームの2投球を加算
-  def strike_score(frame, index)
-    frame.score + @frames[index + 1].first_shot.score + @frames[index + 1].second_shot.score
+  def strike_score(frame, next_frame)
+    frame.score + next_frame.first_shot.score + next_frame.second_shot.score
   end
 
-  # 次の投球を加算
-  def spare_score(frame, index)
-    frame.score + @frames[index + 1].first_shot.score
+  def spare_score(frame, next_frame)
+    frame.score + next_frame.first_shot.score
   end
 end
