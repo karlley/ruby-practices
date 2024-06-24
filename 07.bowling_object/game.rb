@@ -12,8 +12,10 @@ class Game
     @frames.each_with_index.sum do |frame, index|
       if index <= 8
         next_frame = @frames[index + 1]
-
-        strike_score(frame, next_frame, index) + spare_score(frame, next_frame) + open_score(frame)
+        [double_shot_score(frame, next_frame, index),
+         strike_score(frame, next_frame),
+         spare_score(frame, next_frame),
+         open_score(frame)].sum
       else
         frame.score
       end
@@ -35,19 +37,22 @@ class Game
     to_9_frames << last_frame
   end
 
-  def strike_score(frame, next_frame, index)
-    return 0 unless frame.strike?
+  def double_shot_score(frame, next_frame, index)
+    return 0 unless frame.strike? && next_frame.strike?
 
-    frame.score + next_frame.first_shot.score + second_shot_score(frame, next_frame, index)
+    next_next_frame = @frames[index + 2]
+    second_shot_score = if index == 8
+                          next_frame.second_shot.score
+                        else
+                          next_next_frame.first_shot.score
+                        end
+    frame.score + next_frame.first_shot.score + second_shot_score
   end
 
-  def second_shot_score(frame, next_frame, index)
-    next_next_frame = @frames[index + 2]
-    if next_frame.strike?
-       index == 8 ? next_frame.second_shot.score : next_next_frame.first_shot.score
-    else
-      next_frame.second_shot.score
-    end
+  def strike_score(frame, next_frame)
+    return 0 unless frame.strike? && !next_frame.strike?
+
+    frame.score + next_frame.first_shot.score + next_frame.second_shot.score
   end
 
   def spare_score(frame, next_frame)
