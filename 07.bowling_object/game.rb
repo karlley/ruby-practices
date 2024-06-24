@@ -12,18 +12,8 @@ class Game
     @frames.each_with_index.sum do |frame, index|
       if index <= 8
         next_frame = @frames[index + 1]
-        next_next_frame = @frames[index + 2]
 
-        case
-        when double_strike?(frame, next_frame)
-          double_strike_score(frame, next_frame, next_next_frame)
-        when frame.strike?
-          strike_score(frame, next_frame)
-        when frame.spare?
-          spare_score(frame, next_frame)
-        else
-          frame.score
-        end
+        strike_score(frame, next_frame, index) + spare_score(frame, next_frame) + open_score(frame)
       else
         frame.score
       end
@@ -45,23 +35,30 @@ class Game
     to_9_frames << last_frame
   end
 
-  def double_strike?(frame, next_frame)
-    frame.strike? && next_frame.strike?
+  def strike_score(frame, next_frame, index)
+    return 0 unless frame.strike?
+
+    frame.score + next_frame.first_shot.score + second_shot_score(frame, next_frame, index)
   end
 
-  def double_strike_score(frame, next_frame, next_next_frame)
-    frame.score + next_frame.first_shot.score + third_shot_score(next_frame, next_next_frame)
-  end
-
-  def third_shot_score(next_frame, next_next_frame)
-    next_next_frame.nil? ? next_frame.second_shot.score : next_next_frame.first_shot.score
-  end
-
-  def strike_score(frame, next_frame)
-    frame.score + next_frame.first_shot.score + next_frame.second_shot.score
+  def second_shot_score(frame, next_frame, index)
+    next_next_frame = @frames[index + 2]
+    if next_frame.strike?
+       index == 8 ? next_frame.second_shot.score : next_next_frame.first_shot.score
+    else
+      next_frame.second_shot.score
+    end
   end
 
   def spare_score(frame, next_frame)
+    return 0 unless frame.spare?
+
     frame.score + next_frame.first_shot.score
+  end
+
+  def open_score(frame)
+    return 0 if frame.strike? || frame.spare?
+
+    frame.score
   end
 end
