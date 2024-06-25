@@ -12,10 +12,10 @@ class Game
     @frames.each_with_index.sum do |frame, index|
       if index <= 8
         next_frame = @frames[index + 1]
-        [double_shot_score(frame, next_frame, index),
-         strike_score(frame, next_frame),
-         spare_score(frame, next_frame),
-         open_score(frame)].sum
+        double_shot_score(frame, next_frame, index) +
+        strike_score(frame, next_frame) +
+        spare_score(frame, next_frame) +
+        open_score(frame)
       else
         frame.score
       end
