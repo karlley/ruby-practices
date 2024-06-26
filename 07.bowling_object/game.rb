@@ -4,7 +4,7 @@ require_relative 'frame'
 
 class Game
   def initialize(inputs)
-    frame_marks = split_to_frame_marks(inputs)
+    frame_marks = generate_frame_marks(inputs)
     @frames = frame_marks.map { |marks| Frame.new(marks) }
   end
 
@@ -24,29 +24,31 @@ class Game
 
   private
 
-  # ストライクの場合は[X, 0]に変換
-  # 10フレーム以降の[X, 0]の0を削除
-  # 10フレーム以降を1つのフレームに結合して最終フレーム化
-  def split_to_frame_marks(inputs)
-    frames = inputs.map do |input|
+  def generate_frame_marks(inputs)
+    frames = parse_inputs_to_frames(inputs)
+    frames.slice(..8) << remove_extra_zero(frames.slice(9..))
+  end
+
+  def parse_inputs_to_frames(inputs)
+    inputs.map do |input|
       input == 'X' ? %w[X 0] : input
     end.flatten.each_slice(2).to_a
-    frames[9..].each { |frame| frame.pop if frame[0] == 'X' }
-    to_9_frames = frames.slice(..8)
-    last_frame = frames.slice(9..).flatten
-    to_9_frames << last_frame
+  end
+
+  def remove_extra_zero(frames)
+    frames.each { |frame| frame.pop if frame[0] == 'X' }.flatten
   end
 
   def double_shot_score(frame, next_frame, index)
     return 0 unless frame.strike? && next_frame.strike?
 
     next_next_frame = @frames[index + 2]
-    second_shot_score = if index == 8
+    third_shot_score = if index == 8
                           next_frame.second_shot.score
                         else
                           next_next_frame.first_shot.score
                         end
-    frame.score + next_frame.first_shot.score + second_shot_score
+    frame.score + next_frame.first_shot.score + third_shot_score
   end
 
   def strike_score(frame, next_frame)
