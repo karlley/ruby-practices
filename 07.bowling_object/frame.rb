@@ -3,6 +3,8 @@
 require_relative 'shot'
 
 class Frame
+  MAX_SCORE = 10
+
   attr_reader :first_shot, :second_shot, :third_shot
 
   def initialize(marks)
@@ -12,11 +14,11 @@ class Frame
   end
 
   def strike?
-    first_shot.score == 10
+    first_shot.score == MAX_SCORE
   end
 
   def spare?
-    first_shot.score < 10 && first_shot.score + second_shot.score == 10
+    first_shot.score < MAX_SCORE && first_shot.score + second_shot.score == MAX_SCORE
   end
 
   def score
