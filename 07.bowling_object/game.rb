@@ -13,15 +13,7 @@ class Game
 
   def total_score
     @frames.each_with_index.sum do |frame, index|
-      if index <= LAST_REGULAR_FRAME
-        next_frame = @frames[index + 1]
-        double_shot_score(frame, next_frame, index) +
-          strike_score(frame, next_frame) +
-          spare_score(frame, next_frame) +
-          open_score(frame)
-      elsif index == LAST_FRAME
-        frame.score
-      end
+      frame.score + bonus_score(frame, index)
     end
   end
 
@@ -42,33 +34,37 @@ class Game
     frames.each { |frame| frame.pop if frame[0] == 'X' }.flatten
   end
 
-  def double_shot_score(frame, next_frame, index)
-    return 0 unless frame.strike? && next_frame.strike?
+  def bonus_score(frame, index)
+    return 0 if index == LAST_FRAME
 
+    next_frame = @frames[index + 1]
+    if frame.strike?
+      strike_score(next_frame, index)
+    elsif frame.spare?
+      spare_score(next_frame)
+    else
+      0
+    end
+  end
+
+  def strike_score(next_frame, index)
+    if next_frame.strike?
+      next_frame.first_shot.score + second_shot_score(next_frame, index)
+    else
+      next_frame.first_shot.score + next_frame.second_shot.score
+    end
+  end
+
+  def second_shot_score(next_frame, index)
     next_next_frame = @frames[index + 2]
-    third_shot_score = if index == LAST_REGULAR_FRAME
-                         next_frame.second_shot.score
-                       else
-                         next_next_frame.first_shot.score
-                       end
-    frame.score + next_frame.first_shot.score + third_shot_score
+    if index == LAST_REGULAR_FRAME
+      next_frame.second_shot.score
+    else
+      next_next_frame.first_shot.score
+    end
   end
 
-  def strike_score(frame, next_frame)
-    return 0 unless frame.strike? && !next_frame.strike?
-
-    frame.score + next_frame.first_shot.score + next_frame.second_shot.score
-  end
-
-  def spare_score(frame, next_frame)
-    return 0 unless frame.spare?
-
-    frame.score + next_frame.first_shot.score
-  end
-
-  def open_score(frame)
-    return 0 if frame.strike? || frame.spare?
-
-    frame.score
+  def spare_score(next_frame)
+    next_frame.first_shot.score
   end
 end
