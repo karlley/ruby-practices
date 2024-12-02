@@ -9,7 +9,7 @@ class Command
   end
 
   def self.options
-    ARGV.getopts('a')
+    ARGV.getopts('ar')
   end
 end
 
@@ -23,8 +23,12 @@ class FileScan
     @options['a'] ? File::FNM_DOTMATCH : 0
   end
 
+  def r_option(names)
+    @options['r'] ? names.reverse : names
+  end
+
   def names
-    Dir.glob('*', a_option, base: @path)
+    r_option(Dir.glob('*', a_option, base: @path))
   end
 
   def entries
@@ -82,7 +86,7 @@ end
 def main
   options = Command.options
   path = Command.path
-  entries = FileScan.new(path, options).entries
+  entries = FileScan.new(path, options:).entries
   Display.new(entries).print
 end
 
