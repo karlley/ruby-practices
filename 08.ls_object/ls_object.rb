@@ -7,8 +7,9 @@ require 'etc'
 class LS
   def self.run
     args = InputParser.parse
-    entry_details = EntryDetails.new(args).generate_entry_details
-    Display.print(entry_details, args[:options])
+    entries = EntriesGenerator.new(args[:path], args[:options]).generate
+    display_data = DisplayDataBuilder.build(entries)
+    Display.new(display_data, args[:options]).print
   end
 end
 
@@ -20,76 +21,55 @@ class InputParser
   end
 end
 
-class EntryDetails
-  def initialize(args)
-    @path = args[:path]
-    @options = args[:options]
+class Option
+  def self.apply_all(entries, options)
+    apply_options = []
+    apply_options << ExcludeHiddenFileOption.new unless options['a']
+    apply_options << ReverseOrderOption.new if options['r']
+    apply_options.each do |option|
+      entries = option.apply(entries)
+    end
+    entries
   end
+end
 
-  def generate_entry_details
-    entries = generate_entries
-    { entries:, total: calculate_total(entries) }
+class ReverseOrderOption < Option
+  def apply(entries)
+    entries.reverse
   end
+end
 
-  def generate_entries
-    entry_names.map do |name|
-      Entry.new(name, full_path(name))
+class ExcludeHiddenFileOption < Option
+  def apply(entries)
+    entries.reject do |entry|
+      entry.name.start_with?('.')
     end
   end
+end
+
+class EntriesGenerator
+  def initialize(path, options)
+    @path = path
+    @options = options
+  end
+
+  def generate
+    entries = entry_names.map do |name|
+      Entry.new(name, full_path(name))
+    end
+    Option.apply_all(entries, @options)
+  end
+
+  private
 
   def entry_names
     return [@path] unless File.directory?(@path)
 
-    flag = OptionHelper.dotmatch_flag(@options)
-    # @pathはフルパスでもokだがnameが必要
-    OptionHelper.sort(Dir.glob('*', flag, base: @path), @options)
+    Dir.glob('*', File::FNM_DOTMATCH, base: @path)
   end
 
   def full_path(name)
-    # カレントディレクトリ以外のパス指定で必要
-    File.directory?(@path) ? File.join(@path, name) : name
-  end
-
-  def calculate_total(entries)
-    entries.map(&:blocks).sum
-  end
-end
-
-class OptionHelper
-  MAX_COLUMN = 3
-  COLUMN_WIDTH = 15
-
-  def self.dotmatch_flag(options)
-    options['a'] ? File::FNM_DOTMATCH : 0
-  end
-
-  def self.sort(names, options)
-    options['r'] ? names.reverse : names
-  end
-
-  def self.format(entry_details, options)
-    options['l'] ? format_long(entry_details) : format_grid(entry_details)
-  end
-
-  def self.format_long(entries)
-    entries.map do |entry|
-      "#{entry.type}#{entry.permission} #{entry.nlink} #{entry.user}  #{entry.group}  #{entry.size} #{entry.date} #{entry.time} #{entry.name}"
-    end
-  end
-
-  def self.format_grid(entries)
-    rows = []
-    row_count = (entries.count / MAX_COLUMN.to_f).ceil
-    row_count.times do |row_index|
-      entry_names = []
-      entry_names << entries[row_index].name.ljust(COLUMN_WIDTH)
-      (1...MAX_COLUMN).each do |column_index|
-        entry = entries[row_index + row_count * column_index]
-        entry_names << entry.name.ljust(COLUMN_WIDTH) if entry
-      end
-      rows << entry_names.join('')
-    end
-    rows
+    File.directory?(@path) ? File.join(@path, name) : name # カレントディレクトリ以外のパス指定で必要
   end
 end
 
@@ -143,8 +123,8 @@ class EntryAttributesBuilder
     '2': 's'
   }.freeze
 
-  def self.build(name, entry_path)
-    stat = File.lstat(entry_path)
+  def self.build(name, path)
+    stat = File.lstat(path)
     {
       name:,
       type: TYPE[stat.ftype.to_sym],
@@ -192,22 +172,56 @@ class EntryAttributesBuilder
   end
 end
 
-class Display
-  def self.print(entry_details, options)
-    formatted_entries = OptionHelper.format(entry_details[:entries], options)
-    total = entry_details[:total]
-    options['l'] ? print_long_format(formatted_entries, total) : print_grid(formatted_entries)
+class DisplayDataBuilder
+  MAX_COLUMN = 3
+  COLUMN_WIDTH = 15
+
+  def self.build(entries)
+    {
+      names: build_names(entries),
+      details: build_details(entries),
+      total: calculate_total(entries)
+    }
   end
 
-  def self.print_long_format(entries, total)
-    puts "total #{total}" if entries.size > 1
-    entries.each do |entry|
-      puts entry
+  def self.build_names(entries)
+    rows = []
+    row_count = (entries.count / MAX_COLUMN.to_f).ceil
+    row_count.times do |row_index|
+      entry_names = []
+      entry_names << entries[row_index].name.ljust(COLUMN_WIDTH)
+      (1...MAX_COLUMN).each do |column_index|
+        entry = entries[row_index + row_count * column_index]
+        entry_names << entry.name.ljust(COLUMN_WIDTH) if entry
+      end
+      rows << entry_names.join('')
+    end
+    rows
+  end
+
+  def self.build_details(entries)
+    entries.map do |entry|
+      "#{entry.type}#{entry.permission} #{entry.nlink} #{entry.user}  #{entry.group}  #{entry.size} #{entry.date} #{entry.time} #{entry.name}"
     end
   end
 
-  def self.print_grid(entries)
-    entries.each do |row|
+  def self.calculate_total(entries)
+    entries.map(&:blocks).sum
+  end
+end
+
+class Display
+  def initialize(display_data, options)
+    @names = display_data[:names]
+    @details = display_data[:details]
+    @total = display_data[:total]
+    @show_details = options['l']
+  end
+
+  def print
+    rows = @show_details ? @details : @names
+    puts "total #{@total}" if @show_details && @details.size > 1
+    rows.each do |row|
       puts row
     end
   end
