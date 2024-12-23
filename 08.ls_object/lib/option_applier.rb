@@ -12,6 +12,8 @@ class OptionApplier
     @entries
   end
 
+  private
+
   def exclude_hidden_file
     @entries.reject do |entry|
       entry.name.start_with?('.')

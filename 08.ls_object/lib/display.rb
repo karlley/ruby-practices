@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Display
-  def initialize(display_data, options)
-    @names = display_data[:names]
-    @details = display_data[:details]
-    @total = display_data[:total]
+  def initialize(display_content, options)
+    @names = display_content[:names]
+    @details = display_content[:details]
+    @total = display_content[:total]
     @show_details = options['l']
   end
 

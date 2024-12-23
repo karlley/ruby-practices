@@ -20,6 +20,6 @@ class EntriesGenerator
   end
 
   def full_path(name)
-    File.directory?(@path) ? File.join(@path, name) : name # カレントディレクトリ以外のパス指定で必要
+    File.directory?(@path) ? File.join(@path, name) : name
   end
 end
