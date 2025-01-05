@@ -3,7 +3,7 @@
 
 require 'optparse'
 require 'etc'
-require_relative 'lib/input'
+require_relative 'lib/command_line_arguments'
 require_relative 'lib/option'
 require_relative 'lib/display_content'
 require_relative 'lib/entry'
@@ -11,9 +11,9 @@ require_relative 'lib/entry_metadata_builder'
 
 class Ls
   def self.run
-    input = Input.new
-    option = Option.new(input.options)
-    DisplayContent.new(option, input.path, input.entry_names).print
+    args = CommandLineArguments.new
+    option = Option.new(args.options)
+    DisplayContent.new(option, args.path).print
   end
 end
 

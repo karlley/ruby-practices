@@ -3,8 +3,9 @@
 class DisplayContent
   MAX_COLUMN = 3
   COLUMN_WIDTH = 15
-  def initialize(option, path, entry_names)
+  def initialize(option, path)
     @option = option
+    entry_names = fetch_entry_names(path)
     entries = generate_entries(entry_names, path)
     processed_entries = @option.process(entries)
     @entry_names = build_names(processed_entries)
@@ -21,6 +22,12 @@ class DisplayContent
   end
 
   private
+
+  def fetch_entry_names(path)
+    return [path] unless File.directory?(path)
+
+    Dir.glob('*', File::FNM_DOTMATCH, base: path)
+  end
 
   def generate_entries(entry_names, path)
     entry_names.map do |name|
