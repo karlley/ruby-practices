@@ -7,7 +7,7 @@ class DisplayContent
     @option = option
     entry_names = fetch_entry_names(path)
     entries = generate_entries(entry_names, path)
-    processed_entries = @option.process(entries)
+    processed_entries = process_entries_with_options(entries)
     @entry_names = build_names(processed_entries)
     @entry_details = build_details(processed_entries)
     @entry_total = calculate_total(processed_entries)
@@ -37,6 +37,21 @@ class DisplayContent
 
   def full_path(name, path)
     File.directory?(path) ? File.join(path, name) : name
+  end
+
+  def process_entries_with_options(entries)
+    filtered_entries = @option.include_hidden_files? ? entries : exclude_hidden_file(entries)
+    @option.reverse_order? ? reverse_order(filtered_entries) : filtered_entries
+  end
+
+  def exclude_hidden_file(entries)
+    entries.reject do |entry|
+      entry.name.start_with?('.')
+    end
+  end
+
+  def reverse_order(entries)
+    entries.reverse
   end
 
   def build_names(entries)
