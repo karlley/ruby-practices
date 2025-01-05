@@ -7,7 +7,6 @@ require_relative 'lib/command_line_arguments'
 require_relative 'lib/option'
 require_relative 'lib/display_content'
 require_relative 'lib/entry'
-require_relative 'lib/entry_metadata_builder'
 
 class Ls
   def self.run
