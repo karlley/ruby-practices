@@ -33,38 +33,49 @@ class FileMetaData
   }.freeze
 
   def initialize(name, path)
-    metadata = build_metadata(name, path)
-    @name = metadata[:name]
-    @type = metadata[:type]
-    @permission = metadata[:permission]
-    @nlink = metadata[:nlink]
-    @user = metadata[:user]
-    @group = metadata[:group]
-    @size = metadata[:size]
-    @date = metadata[:date]
-    @time = metadata[:time]
-    @blocks = metadata[:blocks]
+    @name = name
+    @stat = File.lstat(path)
   end
 
-  attr_reader :name, :type, :permission, :nlink, :user, :group, :size, :date, :time, :blocks
+  attr_reader :name
+
+  def type
+    TYPE[@stat.ftype.to_sym]
+  end
+
+  def permission
+    convert_to_permission(@stat)
+  end
+
+  def nlink
+    DisplayContent.format_nlink(@stat)
+  end
+
+  def user
+    Etc.getpwuid(@stat.uid).name
+  end
+
+  def group
+    Etc.getgrgid(@stat.gid).name
+  end
+
+  def size
+    DisplayContent.format_size(@stat)
+  end
+
+  def date
+    DisplayContent.format_date(@stat)
+  end
+
+  def time
+    DisplayContent.format_time(@stat)
+  end
+
+  def blocks
+    @stat.blocks
+  end
 
   private
-
-  def build_metadata(name, path)
-    stat = File.lstat(path)
-    {
-      name:,
-      type: TYPE[stat.ftype.to_sym],
-      permission: convert_to_permission(stat),
-      nlink: DisplayContent.format_nlink(stat),
-      user: Etc.getpwuid(stat.uid).name,
-      group: Etc.getgrgid(stat.gid).name,
-      size: DisplayContent.format_size(stat),
-      date: DisplayContent.format_date(stat),
-      time: DisplayContent.format_time(stat),
-      blocks: stat.blocks
-    }
-  end
 
   def convert_to_permission(stat)
     permission_digits = stat.mode.to_s(8)[-3, 3].split('')
