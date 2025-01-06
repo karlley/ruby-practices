@@ -56,12 +56,12 @@ class FileMetaData
       name:,
       type: TYPE[stat.ftype.to_sym],
       permission: convert_to_permission(stat),
-      nlink: format_nlink(stat),
+      nlink: DisplayContent.format_nlink(stat),
       user: Etc.getpwuid(stat.uid).name,
       group: Etc.getgrgid(stat.gid).name,
-      size: format_size(stat),
-      date: format_date(stat),
-      time: format_time(stat),
+      size: DisplayContent.format_size(stat),
+      date: DisplayContent.format_date(stat),
+      time: DisplayContent.format_time(stat),
       blocks: stat.blocks
     }
   end
@@ -80,21 +80,5 @@ class FileMetaData
     special_permission = DIGIT_TO_PERMISSION[special_permission_digit.to_sym]
     permission[update_index] = permission[update_index] == '-' ? special_permission.upcase : special_permission
     permission
-  end
-
-  def format_nlink(stat)
-    stat.nlink.to_s.rjust(2)
-  end
-
-  def format_size(stat)
-    stat.size.to_s.rjust(4)
-  end
-
-  def format_date(stat)
-    "#{stat.mtime.month.to_s.rjust(2)} #{stat.mtime.day.to_s.rjust(2)}"
-  end
-
-  def format_time(stat)
-    "#{stat.mtime.strftime('%H')}:#{stat.mtime.strftime('%M')}"
   end
 end

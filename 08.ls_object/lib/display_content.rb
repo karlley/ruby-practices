@@ -21,6 +21,24 @@ class DisplayContent
     end
   end
 
+  class << self
+    def format_nlink(stat)
+      stat.nlink.to_s.rjust(2)
+    end
+
+    def format_size(stat)
+      stat.size.to_s.rjust(4)
+    end
+
+    def format_date(stat)
+      "#{stat.mtime.month.to_s.rjust(2)} #{stat.mtime.day.to_s.rjust(2)}"
+    end
+
+    def format_time(stat)
+      "#{stat.mtime.strftime('%H')}:#{stat.mtime.strftime('%M')}"
+    end
+  end
+
   private
 
   def fetch_entry_names(path)
