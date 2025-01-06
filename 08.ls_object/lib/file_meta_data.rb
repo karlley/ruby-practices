@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Entry
+class FileMetaData
   TYPE = {
     'file': '-',
     'directory': 'd',

@@ -31,7 +31,7 @@ class DisplayContent
 
   def generate_entries(entry_names, path)
     entry_names.map do |name|
-      Entry.new(name, full_path(name, path))
+      FileMetaData.new(name, full_path(name, path))
     end
   end
 
