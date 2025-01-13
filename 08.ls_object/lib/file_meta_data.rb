@@ -48,7 +48,7 @@ class FileMetaData
   end
 
   def nlink
-    DisplayContent.format_nlink(@stat)
+    @stat.nlink
   end
 
   def user
@@ -60,15 +60,11 @@ class FileMetaData
   end
 
   def size
-    DisplayContent.format_size(@stat)
+    @stat.size
   end
 
-  def date
-    DisplayContent.format_date(@stat)
-  end
-
-  def time
-    DisplayContent.format_time(@stat)
+  def mtime
+    @stat.mtime
   end
 
   def blocks

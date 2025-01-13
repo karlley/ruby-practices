@@ -21,24 +21,6 @@ class DisplayContent
     end
   end
 
-  class << self
-    def format_nlink(stat)
-      stat.nlink.to_s.rjust(2)
-    end
-
-    def format_size(stat)
-      stat.size.to_s.rjust(4)
-    end
-
-    def format_date(stat)
-      "#{stat.mtime.month.to_s.rjust(2)} #{stat.mtime.day.to_s.rjust(2)}"
-    end
-
-    def format_time(stat)
-      "#{stat.mtime.strftime('%H')}:#{stat.mtime.strftime('%M')}"
-    end
-  end
-
   private
 
   def fetch_entry_names(path)
@@ -72,6 +54,22 @@ class DisplayContent
     entries.reverse
   end
 
+  def format_nlink(nlink)
+    nlink.to_s.rjust(2)
+  end
+
+  def format_size(size)
+    size.to_s.rjust(4)
+  end
+
+  def format_date(mtime)
+    "#{mtime.month.to_s.rjust(2)} #{mtime.day.to_s.rjust(2)}"
+  end
+
+  def format_time(mtime)
+    "#{mtime.strftime('%H')}:#{mtime.strftime('%M')}"
+  end
+
   def build_names(entries)
     rows = []
     row_count = (entries.count / MAX_COLUMN.to_f).ceil
@@ -89,7 +87,8 @@ class DisplayContent
 
   def build_details(entries)
     entries.map do |entry|
-      "#{entry.type}#{entry.permission} #{entry.nlink} #{entry.user}  #{entry.group}  #{entry.size} #{entry.date} #{entry.time} #{entry.name}"
+      "#{entry.type}#{entry.permission} #{format_nlink(entry.nlink)} #{entry.user}  #{entry.group}
+ #{format_size(entry.size)} #{format_date(entry.mtime)} #{format_time(entry.mtime)} #{entry.name}".delete("\n")
     end
   end
 
