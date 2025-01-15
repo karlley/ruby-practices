@@ -2,20 +2,18 @@
 
 class Option
   def initialize(options)
-    @include_hidden_files = options['a']
-    @reverse_order = options['r']
-    @show_details = options['l']
+    @options = options
   end
 
   def show_details?
-    @show_details
+    @options['l']
   end
 
   def include_hidden_files?
-    @include_hidden_files
+    @options['a']
   end
 
   def reverse_order?
-    @reverse_order
+    @options['r']
   end
 end

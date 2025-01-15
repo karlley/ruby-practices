@@ -5,17 +5,20 @@ class DisplayContent
   COLUMN_WIDTH = 15
   def initialize(option, path)
     @option = option
-    entry_names = fetch_entry_names(path)
-    entries = generate_entries(entry_names, path)
-    processed_entries = process_entries_with_options(entries)
-    @entry_names = build_names(processed_entries)
-    @entry_details = build_details(processed_entries)
-    @entry_total = calculate_total(processed_entries)
+    @entries = generate_entries(fetch_entry_names(path), path)
   end
 
   def print
-    rows = @option.show_details? ? @entry_details : @entry_names
-    puts "total #{@entry_total}" if @option.show_details? && @entry_details.size > 1
+    processed_entries = process_entries_with_options(@entries)
+    if @option.show_details?
+      rows = build_details(processed_entries)
+      entries_total = calculate_total(processed_entries)
+      entries_size = rows.size
+    else
+      rows = build_names(processed_entries)
+    end
+
+    puts "total #{entries_total}" if @option.show_details? && entries_size > 1
     rows.each do |row|
       puts row
     end
@@ -70,6 +73,17 @@ class DisplayContent
     "#{mtime.strftime('%H')}:#{mtime.strftime('%M')}"
   end
 
+  def build_details(entries)
+    entries.map do |entry|
+      "#{entry.type}#{entry.permission} #{format_nlink(entry.nlink)} #{entry.user}  #{entry.group}
+ #{format_size(entry.size)} #{format_date(entry.mtime)} #{format_time(entry.mtime)} #{entry.name}".delete("\n")
+    end
+  end
+
+  def calculate_total(entries)
+    entries.map(&:blocks).sum
+  end
+
   def build_names(entries)
     rows = []
     row_count = (entries.count / MAX_COLUMN.to_f).ceil
@@ -83,16 +97,5 @@ class DisplayContent
       rows << entry_names.join('')
     end
     rows
-  end
-
-  def build_details(entries)
-    entries.map do |entry|
-      "#{entry.type}#{entry.permission} #{format_nlink(entry.nlink)} #{entry.user}  #{entry.group}
- #{format_size(entry.size)} #{format_date(entry.mtime)} #{format_time(entry.mtime)} #{entry.name}".delete("\n")
-    end
-  end
-
-  def calculate_total(entries)
-    entries.map(&:blocks).sum
   end
 end

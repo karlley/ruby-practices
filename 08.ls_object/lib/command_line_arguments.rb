@@ -2,12 +2,16 @@
 
 class CommandLineArguments
   def initialize(argv = ARGV)
-    args = parse(argv)
-    @options = args[:options]
-    @path = args[:path]
+    @args = parse(argv)
   end
 
-  attr_reader :options, :path
+  def options
+    @args[:options]
+  end
+
+  def path
+    @args[:path]
+  end
 
   private
 
