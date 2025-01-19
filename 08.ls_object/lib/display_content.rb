@@ -2,7 +2,7 @@
 
 class DisplayContent
   MAX_COLUMN = 3
-  COLUMN_WIDTH = 15
+  COLUMN_SPACING = 5
   def initialize(option, path)
     @option = option
     @entries = generate_entries(fetch_entry_names(path), path)
@@ -87,12 +87,13 @@ class DisplayContent
   def build_names(entries)
     rows = []
     row_count = (entries.count / MAX_COLUMN.to_f).ceil
+    max_entry_name_length = entries.map(&:name).max_by(&:length).length
     row_count.times do |row_index|
       entry_names = []
-      entry_names << entries[row_index].name.ljust(COLUMN_WIDTH)
+      entry_names << entries[row_index].name.ljust(max_entry_name_length + COLUMN_SPACING)
       (1...MAX_COLUMN).each do |column_index|
         entry = entries[row_index + row_count * column_index]
-        entry_names << entry.name.ljust(COLUMN_WIDTH) if entry
+        entry_names << entry.name.ljust(max_entry_name_length + COLUMN_SPACING) if entry
       end
       rows << entry_names.join('')
     end
