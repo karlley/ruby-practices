@@ -2,24 +2,24 @@
 
 class FileMetaData
   TYPE = {
-    'file': '-',
-    'directory': 'd',
-    'characterSpecial': 'c',
-    'blockSpecial': 'b',
-    'fifo': 'p',
-    'link': 'l',
-    'socket': 's',
-    'unknown': ''
+    file: '-',
+    directory: 'd',
+    characterSpecial: 'c',
+    blockSpecial: 'b',
+    fifo: 'p',
+    link: 'l',
+    socket: 's',
+    unknown: ''
   }.freeze
   PERMISSION = {
-    '0': '---',
-    '1': '--x',
-    '2': '-w-',
-    '3': '-wx',
-    '4': 'r--',
-    '5': 'r-x',
-    '6': 'rw-',
-    '7': 'rwx'
+    0 => '---',
+    1 => '--x',
+    2 => '-w-',
+    3 => '-wx',
+    4 => 'r--',
+    5 => 'r-x',
+    6 => 'rw-',
+    7 => 'rwx'
   }.freeze
   SPECIAL_PERMISSION_INDEX_MAP = {
     1 => [8],
@@ -80,7 +80,7 @@ class FileMetaData
   def convert_to_permission(stat)
     permission_digits = stat.mode.to_s(8)[-3, 3].split('')
     permission = permission_digits.map do |digit|
-      PERMISSION[digit.to_sym]
+      PERMISSION[digit.to_i]
     end.join
     special_permission_digit = stat.mode.to_s(8)[-4]
     special_permission_digit == '0' ? permission : apply_special_permission(permission, special_permission_digit)
